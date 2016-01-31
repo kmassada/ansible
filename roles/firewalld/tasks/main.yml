@@ -1,0 +1,15 @@
+---
+  - name: install prereqs
+    yum: name=firewalld state=latest
+
+  - name: firewalld | enabling firewalld
+    service: name=firewalld enabled=yes
+
+  - name: Set firewalld rules
+    firewalld: service={{item}} permanent=true state=enabled zone=public
+    with_items:
+      - ssh
+      - http
+      - https
+    notify:
+      - restart firewalld

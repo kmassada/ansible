@@ -1,0 +1,23 @@
+---
+  - name: Create the repository for Mongodb-org
+    copy: src=mongodb-org.repo.j2 dest=/etc/yum.repos.d/mongodb-org.repo
+
+  - name: Install the mongodb package
+    yum: name={{ item }} state=installed
+    with_items:
+     - libselinux-python
+     - mongodb-org
+     - mongodb-org-server
+     - mongodb-org-shell
+     - mongodb-org-mongos
+     - mongodb-org-tools
+     - bc
+     - python-pip
+    notify:
+      - restart mongod
+
+  - name: Install the latest pymongo package
+    pip: name=pymongo state=latest use_mirrors=no
+
+  - name: mongod | enabling mongod
+    service: name=mongod enabled=yes

@@ -1,0 +1,12 @@
+---
+- hosts: amazon
+  become: yes
+  become_method: sudo
+
+  roles:
+     - common
+     - epel
+     - ntp
+     - nginx
+     - mongo
+     - nodejs

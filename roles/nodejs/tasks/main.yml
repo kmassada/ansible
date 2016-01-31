@@ -1,0 +1,54 @@
+---
+- name: Create node source directory
+  file: path="/opt/node-v{{nodejs_version}}" state=directory mode=0755
+
+- name: Acquire stats on node source directory
+  stat: path="/opt/node-v{{nodejs_version}}"
+  register: node_source_dir
+
+- name: Acquire stats on node download file
+  stat: path=/tmp/node-v{{nodejs_version}}.tar.gz
+  register: node_source_tar
+- debug: var=node_source_tar
+- debug: var={{ansible_date_time.epoch|float - node_source_dir.stat.ctime}}
+
+- name: Download Source File
+  get_url: url=https://nodejs.org/dist/v{{nodejs_version}}/node-v{{nodejs_version}}.tar.gz dest=/tmp/node-v{{nodejs_version}}.tar.gz
+  when: node_source_tar.stat.exists == False
+
+- name: Unarchive Source File
+  unarchive: src=/tmp/node-v{{nodejs_version}}.tar.gz dest=/opt/ copy=no
+  when: node_source_dir.stat is defined and {{ansible_date_time.epoch|float - node_source_dir.stat.ctime <= 900.0}}
+
+- name: Verify Node's version
+  command: node -v | grep {{nodejs_version}}
+  register: nodejs_version_check
+  ignore_errors: true
+- debug: var=nodejs_version_check
+
+- name: Configure source file
+  command: ./configure
+  args:
+    chdir: "/opt/node-v{{nodejs_version}}"
+  when: (nodejs_version_check|failed) or ('{{nodejs_version}}' not in nodejs_version_check.stdout)
+  ignore_errors: true
+
+- name: Make and Install
+  command: make install
+  args:
+    chdir: "/opt/node-v{{nodejs_version}}"
+  when: (nodejs_version_check|failed) or ('{{nodejs_version}}' not in nodejs_version_check.stdout)
+
+- name: NPM upgrade
+  command: npm install -g npm
+  args:
+    chdir: "/opt/node-v{{nodejs_version}}"
+  when: (nodejs_version_check|failed) or ('{{nodejs_version}}' not in nodejs_version_check.stdout)
+
+- name: Install additional defined npm global packages.
+  npm:
+    name: "{{ item.name }}"
+    version: "{{ item.version | default('') }}"
+    global: yes
+    state: present
+  with_items: nodejs_npm_global_packages

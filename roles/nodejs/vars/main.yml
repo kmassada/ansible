@@ -1,0 +1,10 @@
+# Set the version of Node.js to install (e.g. "0.10", "0.12", "4.x", "5.x").
+nodejs_version: "0.12.9"
+
+# Define a list of global packages to be installed with NPM.
+nodejs_npm_global_packages:
+  - name: grunt-cli
+  - name: pm2
+  - name: nodemon
+  - name: jslint
+    version: 0.9.3
