@@ -8,4 +8,4 @@
     service: name=nginx enabled=yes
 
   - name: Set /var/www/html permissions
-    file: path=/var/www/ state=directory mode=0755 owner={{web_user}} group={{web_user}}
+    file: path=/var/www/ state=directory mode=0755 owner={{web_user}} group={{web_user}} recurse=yes
