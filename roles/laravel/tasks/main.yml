@@ -1,0 +1,28 @@
+---
+  # - name: Copy the code from repository
+  #   git: repo="https://github.com/TryGhost/Ghost.git" dest=/var/www/html/ clone=yes
+  #   when: ghost_package.stat.exists == False
+
+  - name: Verifying laravel folder
+    stat: path=/var/www/laravel
+    register: verify_laravel
+
+  - debug: var=verify_laravel
+
+  - name: Install laravel
+    command: "/usr/local/sbin/composer create-project --prefer-dist laravel/laravel laravel"
+    become_user: "{{web_user}}"
+    args:
+      chdir: "/var/www/"
+      creates: /var/www/laravel
+    when: verify_laravel.stat.exists == False
+
+  - name: Copy php-fpm configuration
+    template: src=www.laravel.conf.j2 dest=/etc/php-fpm.d/www.laravel.conf
+    notify: restart php-fpm
+
+  - name: Create Laravel configuration file
+    template: src=laravel.conf.j2 dest=/etc/nginx/conf.d/laravel.conf
+    notify:
+    - restart nginx
+    - restart php-fpm

@@ -1,0 +1,11 @@
+---
+- hosts: amazon
+  become: yes
+  become_method: sudo
+
+  roles:
+     - php-fpm
+     - laravel
+
+  vars_files:
+    - vault/git-deploy-access-token.yml

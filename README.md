@@ -1,37 +1,30 @@
-## Ghost
-Ghost is a simple publishing platform and very easy to deploy
+## Laravel
+Laravel is a very complete php platform.
 
 the steps usually are,
 
-- Download the latest release of Ghost
-- Unzip in the location you want to install
-- Fire up a terminal
-- npm install --production
-- Start Ghost!
-- Local environment: npm start
-- On a server: npm start --production
-- http://localhost:2368/ghost :tada:
+- Download composer
+- install laravel using composer
+- serve /public folder
 
-the problem however hosting is,
+Hosting laravel is fairly simple, but here are a few things we keep in our minds.
 
-1- need to proxy 2368 to 80 for your webserver
-2- npm start, is not a service or daemon.
+1- composer install sometimes craps out because of api limits
+2- /storage has to be writable by your web user
+3- keep an eye on cgi.fix_path = 1 /etc/php.ini
 
-we solve the two problems
-
-1- using nginx to proxy the port
-2- using pm2 to start or restart the dameon on demand.
 
 ## Ansible to the rescue
 could we automate the entire build process? yes!! Here comes ansible!!
 Ansible is a simple automation system. it has several use cases,
-but in ours we need it to deploy Ghost. each **<role: []>** corresponds to a role created.
+but in ours we need it to deploy Laravel. each **<role: []>** corresponds to a role created.
 
 **roles: [common, epel, firewalld, ntp]**
 
 1- install and configure server
 - ntp
 - epel
+- remi
 - DevTools
 - hostname setting
 - firewalld
@@ -48,24 +41,22 @@ but in ours we need it to deploy Ghost. each **<role: []>** corresponds to a rol
 - mongodb
 - mariadb
 
-**role: [nodejs]**
+**role: [php-fpm]**
 
-4- install Node, NPM and related global packages (Grunt, pm2)
+4- install php-fpm, composer
 
-**role: [ghost]**
+**role: [laravel]**
 
 5- Deployment
-- download ghost from source code
-- npm install all pre-reqs
-- grunt init and grunt prod
-- create a pm2.production.js file for pm2
+- download ghost from source code using composer
+- set nginx and php-fpm settings
 
 ## Missing notes
 
 1- how to run
 
 ```shell
-$ ansible-playbook -i inventory/  ghost-server.yml -vvv
+$ ansible-playbook -i inventory/  laravel-server.yml -vvv
 ```
 
 2- inventory/
@@ -90,4 +81,4 @@ hostname.whatever.com
 
 3- valuts
 
-/vault contains files with passwords. we've learned with vulnerabilities that no encryption is safe, at least to truly put it online. thanks to 'mysql_user' provided by ansible's extra modules, passwords can be set and reset at will. so I constantly change the password. on top of not exposing the db outside, and using 4096 bit rsa file to encrypt it. 
+/vault contains files with passwords. we've learned with vulnerabilities that no encryption is safe, at least to truly put it online. thanks to 'mysql_user' provided by ansible's extra modules, passwords can be set and reset at will. so I constantly change the password. on top of not exposing the db outside, and using 4096 bit rsa file to encrypt it.
