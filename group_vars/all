@@ -3,3 +3,4 @@
 
 httpd_port: 80
 ntpserver:  0.ro.pool.ntp.org
+web_user: nginx

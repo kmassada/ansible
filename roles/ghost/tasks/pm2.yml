@@ -1,0 +1,8 @@
+---
+  - name: Create pm2 configuration file
+    template: src=pm2.production.json.j2 dest=/var/www/html/pm2.production.json
+
+  - name: run pm2
+    command: pm2 startOrRestart pm2.production.json
+    args:
+      chdir: /var/www/html/

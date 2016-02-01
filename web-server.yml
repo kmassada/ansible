@@ -6,6 +6,7 @@
   roles:
      - common
      - epel
+     - remi
      - ntp
      - nginx
      - mongo

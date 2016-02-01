@@ -1,46 +1,6 @@
 ---
-  - name: install prereqs
-    yum: name=git state=latest
-
-  - name: verifying package.json
-    stat: path=/var/www/html/package.json
-    register: ghost_package
-
-  - name: Copy the code from repository
-    git: repo="https://github.com/TryGhost/Ghost.git" dest=/var/www/html/ clone=yes
-    when: ghost_package.stat.exists == False
-
-
-  - name: Install additional npm packages.
-    npm:
-      state: present
-      path: /var/www/html
-
-  - name: Install grunt local
-    npm:
-      name: grunt
-      state: present
-      path: /var/www/html
-
-  - name: Initialize enviornment
-    command: grunt init --force
-    args:
-      chdir: "/var/www/html/"
-
-  - name: Initialize environment to prod
-    command: grunt prod --force
-    args:
-      chdir: "/var/www/html/"
-
-  - name: Create Ghost configuration file
-    template: src=ghost.conf.j2 dest=/etc/nginx/conf.d/ghost.conf
-    notify:
-    - restart nginx
-
-  - name: Create pm2 configuration file
-    template: src=pm2.production.json.j2 dest=/var/www/html/pm2.production.json
-
-  - name: run pm2
-    command: pm2 startOrRestart pm2.production.json
-    args:
-      chdir: /var/www/html/
+  - include: ghost.yml
+    become_user: "{{web_user}}"
+    
+  - include: nginx.yml
+  - include: pm2.yml

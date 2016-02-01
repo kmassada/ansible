@@ -2,6 +2,9 @@
   - name: install the 'Development tools' package group
     yum: name="@Development tools" state=present
 
+  - name: install prereqs
+    yum: name=git state=latest
+
   - name: selinux disable
     selinux: state=disabled
 

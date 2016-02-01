@@ -2,6 +2,6 @@
 - hosts: amazon
   become: yes
   become_method: sudo
-
+  
   roles:
      - ghost
