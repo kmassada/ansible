@@ -1,6 +1,11 @@
 ---
   - name: Create the repository for Mongodb-org
-    copy: src=mongodb-org.repo.j2 dest=/etc/yum.repos.d/mongodb-org.repo
+    copy: 
+      src: "mongodb-org-{{ ansible_distribution }}.repo.j2" 
+      dest: /etc/yum.repos.d/mongodb-org.repo
+
+  - name: Update the repo
+    command: yum update -y
 
   - name: Install the mongodb package
     yum: name={{ item }} state=installed
@@ -18,6 +23,10 @@
 
   - name: Install the latest pymongo package
     pip: name=pymongo state=latest use_mirrors=no
+    ignore_errors: yes
 
   - name: mongod | enabling mongod
     service: name=mongod enabled=yes
+    
+  - name: start mongod
+    service: name=mongod state=started
