@@ -9,7 +9,7 @@
     selinux: state=disabled
 
   - name: set hostname
-    hostname: name=web.{{inventory_hostname}}
+    hostname: name={{ ansible_distribution }}.{{inventory_hostname}}
 
   - name: "Build hosts file"
     lineinfile: dest=/etc/hosts regexp='.*{{ item }}$' line="{{ hostvars[item].ansible_default_ipv4.address }} {{item}}" state=present
