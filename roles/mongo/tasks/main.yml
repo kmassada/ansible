@@ -5,19 +5,23 @@
       dest: /etc/yum.repos.d/mongodb-org.repo
 
   - name: Update the repo
-    command: yum update -y
+    command: yum clean expire-cache
 
   - name: Install the mongodb package
-    yum: name={{ item }} state=installed
+    yum: name={{ item }} state=present
     with_items:
      - libselinux-python
+     - python-pip
+
+  - name: Install the mongodb package
+    yum: name={{ item }} enablerepo="mongodb-org-3.2" state=installed
+    with_items:
      - mongodb-org
      - mongodb-org-server
      - mongodb-org-shell
      - mongodb-org-mongos
      - mongodb-org-tools
      - bc
-     - python-pip
     notify:
       - restart mongod
 
